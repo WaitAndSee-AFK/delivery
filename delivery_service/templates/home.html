@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Служба доставки{% endblock %}
+
+{% block content %}
+    <h1>Добро пожаловать в нашу службу доставки!</h1>
+    <p>Быстрая и надежная доставка для вас</p>
+    
+    {% if not user.is_authenticated %}
+        <div style="margin-top: 2rem;">
+            <a href="{% url 'register' %}" style="background: #1e90ff; color: white; padding: 0.5rem 1rem; text-decoration: none;">
+                Зарегистрироваться
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
