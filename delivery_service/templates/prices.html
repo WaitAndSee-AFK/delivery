@@ -12,14 +12,12 @@
             </tr>
         </thead>
         <tbody>
+            {% for price in prices %}
             <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">Экспресс-доставка</td>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">500 руб.</td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ price.service.name }}</td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ price.price_value }} руб.</td>
             </tr>
-            <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">Стандартная доставка</td>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">300 руб.</td>
-            </tr>
+            {% endfor %}
         </tbody>
     </table>
 {% endblock %}

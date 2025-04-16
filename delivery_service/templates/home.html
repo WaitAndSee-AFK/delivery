@@ -3,14 +3,147 @@
 {% block title %}Главная - Служба доставки{% endblock %}
 
 {% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+    .hero-section {
+        background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+        color: white;
+        padding: 5rem 2rem;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .hero-section h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+        line-height: 1.6;
+    }
+
+    .cta-button {
+        display: inline-block;
+        background: white;
+        color: #1e90ff;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        background: #f8f9fa;
+    }
+
+    .features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 4rem;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        width: 280px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: #1e90ff;
+        margin-bottom: 1rem;
+    }
+
+    .feature-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .feature-text {
+        color: #666;
+        line-height: 1.5;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2.2rem;
+        }
+
+        .hero-section {
+            padding: 3rem 1rem;
+        }
+
+        .features {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+
+<div class="hero-section">
     <h1>Добро пожаловать в нашу службу доставки!</h1>
-    <p>Быстрая и надежная доставка для вас</p>
-    
+    <p>Быстрая, надежная и безопасная доставка для вашего удобства. Мы работаем для вас 24/7!</p>
+
     {% if not user.is_authenticated %}
-        <div style="margin-top: 2rem;">
-            <a href="{% url 'register' %}" style="background: #1e90ff; color: white; padding: 0.5rem 1rem; text-decoration: none;">
-                Зарегистрироваться
-            </a>
-        </div>
+        <a href="{% url 'register' %}" class="cta-button">Зарегистрироваться</a>
     {% endif %}
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-icon">🚚</div>
+        <h3 class="feature-title">Быстрая доставка</h3>
+        <p class="feature-text">Доставка заказов в течение 1-2 часов по всему городу</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3 class="feature-title">Надежность</h3>
+        <p class="feature-text">Гарантия сохранности ваших посылок и документов</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3 class="feature-title">Отслеживание</h3>
+        <p class="feature-text">Реальное время отслеживания вашего заказа</p>
+    </div>
+</div>
+
+<!-- Добавим секцию с изображением -->
+<div style="margin: 4rem auto; text-align: center;">
+    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+         alt="Доставка"
+         style="max-width: 100%; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+</div>
 {% endblock %}
