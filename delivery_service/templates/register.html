@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация - Служба доставки{% endblock %}
+
+{% block content %}
+    <h1>Регистрация</h1>
+    <form method="post" style="max-width: 400px;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="background: #1e90ff; color: white; padding: 0.5rem 1rem; border: none; cursor: pointer;">
+            Зарегистрироваться
+        </button>
+    </form>
+    <p style="margin-top: 1rem;">
+        Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a>
+    </p>
+{% endblock %}

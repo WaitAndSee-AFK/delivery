@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Цены - Служба доставки{% endblock %}
+
+{% block content %}
+    <h1>Наши цены</h1>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f2f2f2;">
+                <th style="padding: 0.5rem; border: 1px solid #ddd;">Услуга</th>
+                <th style="padding: 0.5rem; border: 1px solid #ddd;">Цена</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">Экспресс-доставка</td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">500 руб.</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">Стандартная доставка</td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">300 руб.</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

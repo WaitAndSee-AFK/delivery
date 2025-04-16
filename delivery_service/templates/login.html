@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Вход - Служба доставки{% endblock %}
+
+{% block content %}
+    <h1>Вход</h1>
+    <form method="post" style="max-width: 400px;">
+        {% csrf_token %}
+        <div style="margin-bottom: 1rem;">
+            <label for="username">Логин:</label>
+            <input type="text" name="username" id="username" required style="width: 100%; padding: 0.5rem;">
+        </div>
+        <div style="margin-bottom: 1rem;">
+            <label for="password">Пароль:</label>
+            <input type="password" name="password" id="password" required style="width: 100%; padding: 0.5rem;">
+        </div>
+        <button type="submit" style="background: #1e90ff; color: white; padding: 0.5rem 1rem; border: none; cursor: pointer;">
+            Войти
+        </button>
+    </form>
+    <p style="margin-top: 1rem;">
+        Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a>
+    </p>
+{% endblock %}
