@@ -104,7 +104,7 @@
 
                 <div class="right-nav">
                     {% if user.is_authenticated %}
-                        <span class="user-greeting">Привет, {{ user.username }}!</span>
+                        <span class="user-greeting">Привет, {{ user.name }}!</span>
                         <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Профиль</a>
                         <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
                             {% csrf_token %}

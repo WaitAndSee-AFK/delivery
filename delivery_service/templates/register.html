@@ -3,15 +3,101 @@
 {% block title %}Регистрация - Служба доставки{% endblock %}
 
 {% block content %}
-    <h1>Регистрация</h1>
-    <form method="post" style="max-width: 400px;">
+<div style="max-width: 500px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <h1 style="color: #1e90ff; text-align: center; margin-bottom: 1.5rem;">Регистрация</h1>
+
+    <form method="post" style="width: 100%;">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" style="background: #1e90ff; color: white; padding: 0.5rem 1rem; border: none; cursor: pointer;">
+
+        <div style="margin-bottom: 1.5rem; width: 100%;">
+            <label for="id_phone" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                Номер телефона:
+            </label>
+            {{ form.phone }}
+            {% for error in form.phone.errors %}
+            <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-bottom: 1.5rem; width: 100%;">
+            <label for="id_name" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                Имя:
+            </label>
+            {{ form.name }}
+            {% for error in form.name.errors %}
+            <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-bottom: 1.5rem; width: 100%;">
+            <label for="id_password1" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                Пароль:
+            </label>
+            {{ form.password1 }}
+            {% for error in form.password1.errors %}
+            <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-bottom: 2rem; width: 100%;">
+            <label for="id_password2" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                Подтверждение пароля:
+            </label>
+            {{ form.password2 }}
+            {% for error in form.password2.errors %}
+            <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit"
+                style="width: 100%; background: linear-gradient(135deg, #1e90ff, #0047ab); color: white; padding: 0.75rem;
+                       border: none; border-radius: 4px; font-weight: 500; font-size: 1rem; cursor: pointer;
+                       transition: transform 0.3s ease, box-shadow 0.3s ease;">
             Зарегистрироваться
         </button>
     </form>
-    <p style="margin-top: 1rem;">
-        Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a>
+
+    <p style="text-align: center; margin-top: 1.5rem; color: #666;">
+        Уже есть аккаунт? <a href="{% url 'login' %}" style="color: #1e90ff; text-decoration: none; font-weight: 500;">Войдите</a>
     </p>
+</div>
+
+<style>
+    input, select {
+        width: calc(100% - 1.5rem);
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+    input:focus, select:focus {
+        outline: none;
+        border-color: #1e90ff;
+        box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.2);
+    }
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
+    }
+    a:hover {
+        color: #0047ab;
+        text-decoration: underline;
+    }
+    nav a {
+        text-decoration: none !important;
+    }
+    nav a:hover {
+        text-decoration: none !important;
+    }
+    .errorlist {
+        color: red;
+        list-style: none;
+        padding-left: 0;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+    }
+</style>
 {% endblock %}
