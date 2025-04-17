@@ -114,11 +114,18 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
     username = None  # Удаляем поле username
-    phone = models.CharField(_('Phone'), max_length=20, unique=True)
-    name = models.CharField(_('Name'), max_length=100)
+    phone = models.CharField(
+        _('Номер телефона'),  # Здесь указываем перевод (он же будет использован как verbose_name)
+        max_length=20,
+        unique=True
+    )
+    name = models.CharField(
+        _('Имя'),
+        max_length=100
+    )
 
     USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = ['name']  # Обязательные поля при createsuperuser
+    REQUIRED_FIELDS = ['name']
 
     objects = CustomUserManager()
 

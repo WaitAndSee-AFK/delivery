@@ -89,40 +89,41 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <nav>
-                <div class="left-nav">
-                    <a href="{% url 'home' %}" class="logo">
-                        <i class="fas fa-truck-fast"></i>
-                        <span>ДоставкаЭкспресс</span>
-                    </a>
-                    <a href="{% url 'home' %}"><i class="fas fa-home"></i> Главная</a>
-                    <a href="{% url 'services' %}"><i class="fas fa-box-open"></i> Услуги</a>
-                    <a href="{% url 'prices' %}"><i class="fas fa-tag"></i> Цены</a>
-                </div>
+<header>
+    <div class="container">
+        <nav>
+            <div class="left-nav">
+                <a href="{% url 'home' %}" class="logo">
+                    <i class="fas fa-truck-fast"></i>
+                    <span>ДоставкаЭкспресс</span>
+                </a>
+                <a href="{% url 'home' %}"><i class="fas fa-home"></i> Главная</a>
+                <a href="{% url 'services' %}"><i class="fas fa-box-open"></i> Услуги</a>
+                <a href="{% url 'prices' %}"><i class="fas fa-tag"></i> Цены</a>
+            </div>
 
-                <div class="right-nav">
-                    {% if user.is_authenticated %}
-                        <span class="user-greeting">Привет, {{ user.name }}!</span>
-                        <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Профиль</a>
-                        <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
-                            {% csrf_token %}
-                            <button type="submit">
-                                <i class="fas fa-sign-out-alt"></i> Выйти
-                            </button>
-                        </form>
-                    {% else %}
-                        <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Вход</a>
-                        <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i></a>
-                    {% endif %}
-                </div>
-            </nav>
-        </div>
-    </header>
+            <div class="right-nav">
+                {% if user.is_authenticated %}
+                <span class="user-greeting">Привет, {{ user.name }}!</span>
+                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Профиль</a>
+                <form id="logout-form" method="post" action="/logout/">
+                    {% csrf_token %}
+                    <button type="submit">
+                        <i class="fas fa-sign-out-alt"></i> Выйти
+                    </button>
+                </form>
 
-    <main class="container">
-        {% block content %}{% endblock %}
-    </main>
+                {% else %}
+                <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Вход</a>
+                <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i></a>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
 </body>
 </html>
