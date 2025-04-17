@@ -5,8 +5,7 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LoginView, LogoutView
-from delivery.views import (
-    home,
+from delivery.views import (home,
     services,
     prices,
     register,
