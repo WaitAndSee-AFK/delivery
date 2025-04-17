@@ -4,6 +4,7 @@ URL configuration for delivery_service project.
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView, LogoutView
 from delivery.views import (
     home,
     services,
@@ -20,6 +21,6 @@ urlpatterns = [
     path('prices/', prices, name='prices'),
     path('register/', register, name='register'),
     path('login/', login_view, name='login'),  # Используем функцию login_view
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
     path('profile/', profile, name='profile'),
 ]
