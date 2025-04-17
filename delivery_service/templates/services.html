@@ -1,6 +1,28 @@
 {% extends "base.html" %}
 
+{% block title %}Услуги - Служба доставки{% endblock %}
+
 {% block content %}
+<div style="max-width: 1800px; margin: 2rem auto; padding: 0 1rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div style="display: flex; align-items: center; margin-bottom: 1.5rem; justify-content: center;">
+        <i style="font-size: 2rem; color: #1e90ff;" class="fas fa-box-open"></i>
+        <h1 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 2.2rem; color: #1e90ff; margin-left: 10px; font-weight: 600; text-align: center;">
+            Наши услуги
+        </h1>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; justify-items: stretch;">
+        {% for service in services %}
+        <div style="background: white; border-radius: 12px; padding: 1.8rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; border: 1px solid rgba(30, 144, 255, 0.15); width: 100%; box-sizing: border-box;">
+            <h3 style="font-size: 1.3rem; color: #1e90ff; margin-bottom: 1.2rem; font-weight: 600;">{{ service.name }}</h3>
+            <p style="color: #555; line-height: 1.7; margin-bottom: 1.8rem; font-size: 0.95rem;">{{ service.description }}</p>
+            <div style="font-weight: 700; color: #1e90ff; text-align: right; padding-top: 1.2rem; border-top: 1px dashed #e0e0e0; font-size: 1.2rem;">
+                {{ service.price }} руб.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
 <style>
     /* Основные стили */
@@ -13,139 +35,56 @@
         background-color: #f8f9fa;
     }
 
-    /* Заголовок с иконкой */
-    .services-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        justify-content: center;
-    }
-
-    .services-title h1 {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 2.2rem;
-        color: #1e90ff;
-        margin-left: 10px;
-        font-weight: 600;
-        text-align: center;
-    }
-
-    .services-title .icon {
-        font-size: 2rem;
-        color: #1e90ff;
-    }
-
-    /* Контейнер услуг */
-    .services-container {
-        max-width: 1800px;
-        margin: 2rem auto;
-        padding: 0 1rem;
-    }
-
-    /* Сетка услуг */
-    .services-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 2rem;
-        justify-items: stretch;
-    }
-
-    /* Карточка услуги */
-    .service-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.8rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(30, 144, 255, 0.15);
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .service-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .service-card h3 {
-        font-size: 1.3rem;
-        color: #1e90ff;
-        margin-bottom: 1.2rem;
-        font-weight: 600;
-    }
-
-    .service-card p {
-        color: #555;
-        line-height: 1.7;
-        margin-bottom: 1.8rem;
-        font-size: 0.95rem;
-    }
-
-    .price {
-        font-weight: 700;
-        color: #1e90ff;
-        text-align: right;
-        padding-top: 1.2rem;
-        border-top: 1px dashed #e0e0e0;
-        font-size: 1.2rem;
-    }
-
     /* Адаптивность */
     @media (max-width: 1200px) {
-        .services-grid {
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        div[style*="grid-template-columns: repeat(4, 1fr)"] {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
         }
     }
 
     @media (max-width: 768px) {
-        .services-title h1 {
-            font-size: 1.8rem;
+        h1[style*="font-size: 2.2rem"] {
+            font-size: 1.8rem !important;
         }
 
-        .services-title .icon {
-            font-size: 1.8rem;
+        i[style*="font-size: 2rem"] {
+            font-size: 1.8rem !important;
         }
 
-        .services-grid {
-            grid-template-columns: repeat(2, 1fr);
+        div[style*="grid-template-columns: repeat(4, 1fr)"] {
+            grid-template-columns: repeat(2, 1fr) !important;
         }
     }
 
     @media (max-width: 480px) {
-        .services-container {
-            padding: 0 1rem;
+        div[style*="max-width: 1800px"] {
+            padding: 0 1rem !important;
         }
 
-        .services-title {
-            flex-direction: column;
-            gap: 10px;
+        div[style*="display: flex"] {
+            flex-direction: column !important;
+            gap: 10px !important;
         }
 
-        .service-card {
-            padding: 1.5rem;
+        div[style*="background: white; border-radius: 12px"] {
+            padding: 1.5rem !important;
         }
 
-        .services-grid {
-            grid-template-columns: 1fr;
+        div[style*="grid-template-columns: repeat(4, 1fr)"] {
+            grid-template-columns: 1fr !important;
         }
     }
+
+    /* Общие стили из формы регистрации */
+    a:hover {
+        color: #0047ab;
+        text-decoration: underline;
+    }
+    nav a {
+        text-decoration: none !important;
+    }
+    nav a:hover {
+        text-decoration: none !important;
+    }
 </style>
-
-<div class="services-container">
-    <div class="services-title">
-        <i class="icon fas fa-box-open"></i>
-        <h1>Наши услуги</h1>
-    </div>
-
-    <div class="services-grid">
-        {% for service in services %}
-        <div class="service-card">
-            <h3>{{ service.name }}</h3>
-            <p>{{ service.description }}</p>
-            <div class="price">{{ service.price }} руб.</div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
 {% endblock %}

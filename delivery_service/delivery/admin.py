@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import Role, CustomUser, Service, PriceList, Price
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 @admin.register(Price)
 class PriceAdmin(admin.ModelAdmin):
@@ -39,23 +40,24 @@ class RoleAdmin(admin.ModelAdmin):
 
 # Кастомная конфигурация для модели пользователя
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'phone', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = CustomUser
+    list_display = ('phone', 'name', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'is_active')
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Персональная информация', {'fields': ('first_name', 'last_name', 'email', 'phone')}),
-        ('Права доступа', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
-        }),
-        ('Важные даты', {'fields': ('last_login', 'date_joined')}),
+        (None, {'fields': ('phone', 'password')}),
+        ('Personal info', {'fields': ('name', 'email')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'first_name', 'last_name', 'phone', 'password1', 'password2'),
+            'fields': ('phone', 'name', 'password1', 'password2'),
         }),
     )
-    search_fields = ('username', 'first_name', 'last_name', 'email', 'phone')
-    ordering = ('username',)
+    search_fields = ('phone', 'name')
+    ordering = ('phone',)
 
 admin.site.register(CustomUser, CustomUserAdmin)

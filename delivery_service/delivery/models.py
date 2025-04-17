@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 class Service(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название услуги")
@@ -94,14 +95,32 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
-class CustomUser(AbstractUser):
-    phone = models.CharField(max_length=20, verbose_name="Телефон", blank=True)
-    first_name = models.CharField(max_length=30, verbose_name="Имя", blank=False)
-    last_name = models.CharField(max_length=30, verbose_name="Фамилия", blank=False)
 
-    class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+class CustomUserManager(BaseUserManager):
+    def create_user(self, phone, name, password=None, **extra_fields):
+        if not phone:
+            raise ValueError(_('The Phone must be set'))
+        user = self.model(phone=phone, name=name, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, phone, name, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+        return self.create_user(phone, name, password, **extra_fields)
+
+
+class CustomUser(AbstractUser):
+    username = None  # Удаляем поле username
+    phone = models.CharField(_('Phone'), max_length=20, unique=True)
+    name = models.CharField(_('Name'), max_length=100)
+
+    USERNAME_FIELD = 'phone'
+    REQUIRED_FIELDS = ['name']  # Обязательные поля при createsuperuser
+
+    objects = CustomUserManager()
 
     def __str__(self):
-        return f"{self.get_full_name()} ({self.username})"
+        return f"{self.name} ({self.phone})"
