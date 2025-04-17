@@ -3,21 +3,102 @@
 {% block title %}Цены - Служба доставки{% endblock %}
 
 {% block content %}
-    <h1>Наши цены</h1>
-    <table style="width: 100%; border-collapse: collapse;">
+<style>
+    /* Основные стили */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        color: #1e90ff;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .price-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    /* Стили таблицы */
+    .price-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .price-table thead {
+        background: linear-gradient(135deg, #1e90ff, #0047ab);
+        color: white;
+    }
+
+    .price-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 500;
+        font-size: 1.1rem;
+    }
+
+    .price-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 1rem;
+    }
+
+    .price-table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .price-table tbody tr:hover {
+        background-color: #f0f7ff;
+        transition: background-color 0.3s ease;
+    }
+
+    .price-value {
+        font-weight: 600;
+        color: #1e90ff;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        .price-table th,
+        .price-table td {
+            padding: 0.8rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="price-container">
+    <h1><i class="fas fa-tag"></i> Наши цены</h1>
+
+    <table class="price-table">
         <thead>
-            <tr style="background: #f2f2f2;">
-                <th style="padding: 0.5rem; border: 1px solid #ddd;">Услуга</th>
-                <th style="padding: 0.5rem; border: 1px solid #ddd;">Цена</th>
+            <tr>
+                <th><i class="fas fa-box-open"></i> Услуга</th>
+                <th><i class="fas fa-ruble-sign"></i> Цена</th>
             </tr>
         </thead>
         <tbody>
             {% for price in prices %}
             <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ price.service.name }}</td>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ price.price_value }} руб.</td>
+                <td>{{ price.service.name }}</td>
+                <td class="price-value">{{ price.price_value }} руб.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
 {% endblock %}
