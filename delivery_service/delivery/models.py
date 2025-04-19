@@ -2,6 +2,87 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('courier', 'Доставляет курьер'),
+        ('ready_for_pickup', 'Готов к выдаче'),
+        ('delivered', 'Вручен'),
+        ('partially_delivered', 'Частично вручен'),
+        ('not_delivered', 'Не вручен'),
+    ]
+
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Отправитель",
+        related_name='orders_sent'
+    )
+    service = models.ForeignKey(
+        'Service',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Услуга",
+        related_name='orders'
+    )
+
+    sender_address = models.CharField(
+        max_length=255,
+        verbose_name="Адрес отправки",
+        blank=True,
+        default=''
+    )
+    order_description = models.TextField(
+        verbose_name="Описание заказа",
+        blank=True,
+        default=''
+    )
+    recipient_address = models.CharField(
+        max_length=255,
+        verbose_name="Адрес получателя",
+        blank=True,
+        default=''
+    )
+    cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Стоимость",
+        null=True,
+        blank=True,
+        help_text="Стоимость берется из услуги"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='courier',
+        verbose_name="Статус заказа"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        sender_name = self.sender.name if self.sender else "Неизвестный отправитель"
+        service_name = self.service.name if self.service else "Без услуги"
+        cost_display = f"{self.cost} руб." if self.cost is not None else "Цена не указана"
+        return f"Заказ от {sender_name} — {service_name} — {cost_display}"
+
+    def save(self, *args, **kwargs):
+        # Если выбрана услуга и цена в заказе не указана или отличается от цены услуги — обновляем
+        if self.service:
+            service_price = self.service.price
+            if service_price is not None and (self.cost is None or self.cost != service_price):
+                self.cost = service_price
+        super().save(*args, **kwargs)
+
 
 class Service(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название услуги")
