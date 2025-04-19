@@ -5,8 +5,62 @@ from delivery.forms import CustomUserCreationForm
 from django.contrib.auth.views import LoginView
 from .models import Service, Price
 from django.contrib import messages
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, CreateView
+from django.urls import reverse_lazy
+from .forms import ServiceForm, PriceForm
+from django.contrib.auth.decorators import login_required, user_passes_test
+
 
 # Create your views here.
+def staff_or_superuser_check(user):
+    return user.is_authenticated and (user.is_staff or user.is_superuser)
+
+@login_required
+@user_passes_test(staff_or_superuser_check)
+def orders(request):
+    orders = []
+    return render(request, 'delivery/orders.html', {'orders': orders})
+
+
+class PriceListView(ListView):
+    model = Price
+    template_name = 'delivery/prices.html'
+    context_object_name = 'prices'
+
+class PriceCreateView(CreateView):
+    model = Price
+    form_class = PriceForm
+    template_name = 'delivery/price_form.html'
+    success_url = reverse_lazy('prices')  # Без namespace
+
+class PriceUpdateView(UpdateView):
+    model = Price
+    form_class = PriceForm
+    template_name = 'delivery/price_form.html'
+    success_url = reverse_lazy('prices')
+
+class PriceDeleteView(DeleteView):
+    model = Price
+    template_name = 'delivery/price_confirm_delete.html'
+    success_url = reverse_lazy('prices')
+
+class ServiceCreateView(CreateView):
+    model = Service
+    form_class = ServiceForm
+    template_name = 'delivery/service_form.html'
+    success_url = reverse_lazy('delivery:services')  # Исправлено
+
+class ServiceUpdateView(UpdateView):
+    model = Service
+    form_class = ServiceForm
+    template_name = 'delivery/service_form.html'
+    success_url = reverse_lazy('delivery:services')  # Исправлено
+
+class ServiceDeleteView(DeleteView):
+    model = Service
+    template_name = 'delivery/service_confirm_delete.html'
+    success_url = reverse_lazy('delivery:services')  # Исправлено
+
 class CustomLoginView(LoginView):
     template_name = 'delivery/login.html'  # Укажите правильный путь к шаблону
 

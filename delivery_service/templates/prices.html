@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Цены - Служба доставки{% endblock %}
 
@@ -67,6 +68,80 @@
         color: #1e90ff;
     }
 
+    /* Стили кнопок */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn {
+        padding: 0.75rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .btn-add {
+        background: #1e90ff;
+        color: white;
+    }
+
+    .btn-add:hover {
+        background: #0077cc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-edit {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #43A047;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-delete {
+        background: #f44336;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #d32f2f;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Сообщения */
+    .messages {
+        margin-bottom: 1rem;
+    }
+
+    .alert {
+        padding: 0.75rem 1.25rem;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    /* Контейнер для кнопки добавления */
+    .add-price-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 0.5rem;
+    }
+
     /* Адаптивность */
     @media (max-width: 768px) {
         h1 {
@@ -78,27 +153,93 @@
             padding: 0.8rem;
             font-size: 0.9rem;
         }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .btn {
+            justify-content: center;
+        }
+
+        .add-price-container {
+            justify-content: center;
+        }
     }
 </style>
 
 <div class="price-container">
     <h1><i class="fas fa-tag"></i> Наши цены</h1>
 
-    <table class="price-table">
-        <thead>
-            <tr>
-                <th><i class="fas fa-box-open"></i> Услуга</th>
-                <th><i class="fas fa-ruble-sign"></i> Цена</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for price in prices %}
-            <tr>
-                <td>{{ price.service.name }}</td>
-                <td class="price-value">{{ price.price_value }} руб.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if prices %}
+    {% if user.is_staff or user.is_superuser %}
+    <div class="add-price-container">
+        <!-- Кнопка добавления новой цены - теперь справа над таблицей -->
+        <a href="{% url 'prices:price_create' %}" class="btn btn-add">
+            <i class="fas fa-plus"></i> Добавить цену
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="price-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-box-open"></i> Услуга</th>
+                    <th><i class="fas fa-ruble-sign"></i> Цена</th>
+                    {% if user.is_staff or user.is_superuser %}
+                    <th><i class="fas fa-cog"></i> Действия</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for price in prices %}
+                <tr>
+                    <td>{{ price.service.name|default:"Не указано" }}</td>
+                    <td class="price-value">
+                        {% if price.price_value %}
+                            {{ price.price_value }} руб.
+                        {% else %}
+                            Не указана
+                        {% endif %}
+                    </td>
+                    {% if user.is_staff or user.is_superuser %}
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'prices:price_update' price.id %}" class="btn btn-edit">
+                                <i class="fas fa-edit"></i> Изменить
+                            </a>
+                            <a href="{% url 'prices:price_delete' price.id %}" class="btn btn-delete">
+                                <i class="fas fa-trash-alt"></i> Удалить
+                            </a>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Нет доступных цен.
+        {% if user.is_staff or user.is_superuser %}
+        <a href="{% url 'prices:price_create' %}" class="btn btn-add" style="margin-left: 10px;">
+            <i class="fas fa-plus"></i> Добавить цену
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

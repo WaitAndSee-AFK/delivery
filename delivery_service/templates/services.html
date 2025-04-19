@@ -3,13 +3,55 @@
 {% block title %}Услуги - Служба доставки{% endblock %}
 
 {% block content %}
+<!-- Модальное окно подтверждения удаления -->
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+        <h3 style="color: #f44336; margin-bottom: 1.5rem; font-size: 1.5rem; display: flex; align-items: center;">
+            <i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>
+            Подтвердите удаление
+        </h3>
+        <p id="deleteModalText" style="margin-bottom: 2rem; color: #555; line-height: 1.6;">
+            Вы действительно хотите удалить эту услугу?
+        </p>
+        <div style="display: flex; gap: 1rem;">
+            <form id="deleteForm" method="post" style="flex: 1;">
+                {% csrf_token %}
+                <button type="submit"
+                        style="width: 100%; background: #f44336; color: white; padding: 0.75rem;
+                               border: none; border-radius: 4px; font-weight: 500; cursor: pointer;
+                               transition: all 0.3s ease;">
+                    <i class="fas fa-trash-alt"></i> Удалить
+                </button>
+            </form>
+            <button onclick="cancelDelete()"
+                    style="flex: 1; background: #e0e0e0; padding: 0.75rem; border: none;
+                           border-radius: 4px; font-weight: 500; cursor: pointer;
+                           transition: all 0.3s ease;">
+                <i class="fas fa-times"></i> Отмена
+            </button>
+        </div>
+    </div>
+</div>
+
 <div style="max-width: 1800px; margin: 2rem auto; padding: 0 1rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <!-- Остальное содержимое страницы без изменений -->
     <div style="display: flex; align-items: center; margin-bottom: 1.5rem; justify-content: center;">
         <i style="font-size: 2rem; color: #1e90ff;" class="fas fa-box-open"></i>
         <h1 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 2.2rem; color: #1e90ff; margin-left: 10px; font-weight: 600; text-align: center;">
             Наши услуги
         </h1>
     </div>
+
+    {% if user.is_staff or user.is_superuser %}
+    <div style="margin-bottom: 1.5rem; text-align: right;">
+        <a href="{% url 'delivery:service_create' %}"
+           style="background: #1e90ff; color: white; padding: 0.75rem 1.5rem;
+                  border: none; border-radius: 4px; font-weight: 500; font-size: 1rem;
+                  text-decoration: none; transition: all 0.3s ease;">
+            <i class="fas fa-plus"></i> Добавить услугу
+        </a>
+    </div>
+    {% endif %}
 
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; justify-items: stretch;">
         {% for service in services %}
@@ -20,7 +62,6 @@
                 {{ service.price }} руб.
             </div>
 
-            <!-- Кнопка "Выбрать" только для авторизованных пользователей -->
             {% if user.is_authenticated %}
             <button onclick="selectService({{ service.id }})"
                     style="width: 100%; background: linear-gradient(135deg, #1e90ff, #0047ab); color: white; padding: 0.75rem;
@@ -37,21 +78,20 @@
             </div>
             {% endif %}
 
-            <!-- Кнопки редактирования/удаления для staff -->
             {% if user.is_staff or user.is_superuser %}
             <div style="display: flex; gap: 0.5rem;">
-                <a href="{% url 'admin:delivery_service_change' service.id %}"
+                <a href="{% url 'delivery:service_edit' service.id %}"
                    style="flex: 1; background: #4CAF50; color: white; padding: 0.75rem; text-align: center;
                           border-radius: 4px; font-weight: 500; font-size: 1rem; text-decoration: none;
-                          transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                    Изменить
+                          transition: all 0.3s ease;">
+                    <i class="fas fa-edit"></i> Изменить
                 </a>
-                <a href="{% url 'admin:delivery_service_delete' service.id %}"
-                   style="flex: 1; background: #f44336; color: white; padding: 0.75rem; text-align: center;
-                          border-radius: 4px; font-weight: 500; font-size: 1rem; text-decoration: none;
-                          transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                    Удалить
-                </a>
+                <button onclick="showDeleteModal('{% url 'delivery:service_delete' service.id %}', '{{ service.name|escapejs }}')"
+                        style="flex: 1; background: #f44336; color: white; padding: 0.75rem; text-align: center;
+                               border: none; border-radius: 4px; font-weight: 500; font-size: 1rem; cursor: pointer;
+                               transition: all 0.3s ease;">
+                    <i class="fas fa-trash-alt"></i> Удалить
+                </button>
             </div>
             {% endif %}
         </div>
@@ -60,15 +100,27 @@
 </div>
 
 <script>
+    function showDeleteModal(url, name) {
+        const form = document.getElementById('deleteForm');
+        form.action = url;
+        document.getElementById('deleteModalText').textContent =
+            `Вы действительно хотите удалить услугу "${name}"? Эта операция необратима.`;
+        document.getElementById('deleteModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cancelDelete() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
     function selectService(serviceId) {
-        // Здесь можно добавить логику выбора услуги
         alert('Выбрана услуга с ID: ' + serviceId);
-        // Или отправить AJAX-запрос на сервер
     }
 </script>
 
 <style>
-    /* Основные стили */
+    /* Все стили остаются без изменений */
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: #333;
@@ -78,7 +130,21 @@
         background-color: #f8f9fa;
     }
 
-    /* Адаптивность */
+    #deleteModal button:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    #deleteModal button:first-child:hover {
+        background: #d32f2f !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    #deleteModal button:last-child:hover {
+        background: #bdbdbd !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
     @media (max-width: 1200px) {
         div[style*="grid-template-columns: repeat(4, 1fr)"] {
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
@@ -116,24 +182,27 @@
         div[style*="grid-template-columns: repeat(4, 1fr)"] {
             grid-template-columns: 1fr !important;
         }
+
+        #deleteModal div {
+            padding: 1.5rem !important;
+        }
     }
 
-    /* Общие стили из формы регистрации */
+    a {
+        text-decoration: none;
+    }
+
     a:hover {
-        color: #0047ab;
-        text-decoration: underline;
-    }
-    nav a {
-        text-decoration: none !important;
-    }
-    nav a:hover {
-        text-decoration: none !important;
+        text-decoration: none;
     }
 
-    /* Стили для кнопок */
     button:hover, a[style*="background: #4CAF50"]:hover, a[style*="background: #f44336"]:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    i.fas {
+        margin-right: 5px;
     }
 </style>
 {% endblock %}
