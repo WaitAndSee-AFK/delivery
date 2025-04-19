@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}Служба доставки{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -98,14 +98,18 @@
                         <span>ДоставкаЭкспресс</span>
                     </a>
                     <a href="{% url 'home' %}"><i class="fas fa-home"></i> Главная</a>
-                    <a href="{% url 'services' %}"><i class="fas fa-box-open"></i> Услуги</a>
-                    <a href="{% url 'prices' %}"><i class="fas fa-tag"></i> Цены</a>
+                    <a href="{% url 'delivery:services' %}"><i class="fas fa-box-open"></i> Услуги</a>
+                    <a href="{% url 'prices:prices' %}"><i class="fas fa-tag"></i> Цены</a>
                 </div>
 
                 <div class="right-nav">
                     {% if user.is_authenticated %}
                         <span class="user-greeting">Привет, {{ user.name }}!</span>
-                        <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Профиль</a>
+                        {% if user.is_superuser or user.is_staff %}
+                            <a href="{% url 'orders' %}"><i class="fas fa-shopping-cart"></i> Заказы</a>
+                        {% else %}
+                            <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Профиль</a>
+                        {% endif %}
                         <form class="logoutButton" id="logout-form" method="post" action="/logout/">
                             {% csrf_token %}
                             <button type="submit">
