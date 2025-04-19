@@ -1,7 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Role, CustomUser, Service, PriceList, Price
+from .models import Role, CustomUser, Service, PriceList, Price, Order
 from .forms import CustomUserCreationForm, CustomUserChangeForm
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'sender', 'service', 'cost', 'status', 'created_at')
+    list_filter = ('status', 'created_at', 'service')
+    search_fields = ('sender__name', 'service__name', 'sender_address', 'recipient_address', 'order_description')
+    readonly_fields = ('created_at',)
+
 
 @admin.register(Price)
 class PriceAdmin(admin.ModelAdmin):

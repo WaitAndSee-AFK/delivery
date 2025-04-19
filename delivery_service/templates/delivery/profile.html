@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - Служба доставки{% endblock %}
+
+{% block content %}
+<style>
+    .profile-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        background: #f9f9f9;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        position: relative;
+        text-align: center; /* Выравниваем элементы по центру */
+    }
+    h1 {
+        color: #1e90ff;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+    }
+    .order-info {
+        background: #fff;
+        padding: 1rem;
+        border-radius: 6px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        text-align: left; /* Возвращаем выравнивание текста влево для информации о заказе */
+    }
+    .order-info p {
+        margin: 0.3rem 0;
+    }
+    .edit-profile-btn {
+        display: inline-block; /* Делаем кнопку строчно-блочным элементом */
+        background: #1e90ff;
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для кнопки */
+    }
+    .edit-profile-btn:hover {
+        background: #0047ab;
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); /* Усиливаем тень при наведении */
+    }
+</style>
+
+<div class="profile-container">
+    <h1>Ваш профиль</h1>
+
+    {% if orders %}
+        <div class="order-info">
+            <h2>Ваш последний заказ</h2>
+            {% with order=orders.0 %}
+                <p><strong>Номер заказа:</strong> {{ order.id }}</p>
+                <p><strong>Услуга:</strong> {{ order.service.name|default:"Не указана" }}</p>
+                <p><strong>Статус:</strong> {{ order.get_status_display }}</p>
+                <p><strong>Стоимость:</strong> {{ order.cost|default:"Не указана" }} руб.</p>
+                <p><strong>Адрес отправки:</strong> {{ order.sender_address|default:"Не указан" }}</p>
+                <p><strong>Адрес получателя:</strong> {{ order.recipient_address|default:"Не указан" }}</p>
+                <p><strong>Описание заказа:</strong> {{ order.order_description|default:"Нет описания" }}</p>
+                <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+            {% endwith %}
+        </div>
+    {% endif %}
+
+    <a href="#" class="edit-profile-btn">Редактировать профиль</a>
+</div>
+{% endblock %}

@@ -3,32 +3,173 @@
 {% block title %}Заказы - Служба доставки{% endblock %}
 
 {% block content %}
-<div style="max-width: 900px; margin: 2rem auto; padding: 1rem;">
-    <h1 style="color: #1e90ff; text-align: center; margin-bottom: 2rem;">Заказы</h1>
+<style>
+    /* Основные стили */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        color: #1e90ff;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .orders-container {
+        max-width: 1400px; /* растянули ширину */
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    /* Стили таблицы */
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .orders-table thead {
+        background: linear-gradient(135deg, #1e90ff, #0047ab);
+        color: white;
+    }
+
+    .orders-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 500;
+        font-size: 1.1rem;
+    }
+
+    .orders-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 1rem;
+        vertical-align: middle;
+    }
+
+    .orders-table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .orders-table tbody tr:hover {
+        background-color: #f0f7ff;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Статус с цветом */
+    .status-courier {
+        color: #007bff; /* синий */
+        font-weight: 600;
+    }
+    .status-ready_for_pickup {
+        color: #28a745; /* зеленый */
+        font-weight: 600;
+    }
+    .status-delivered {
+        color: #17a2b8; /* голубой */
+        font-weight: 600;
+    }
+    .status-partially_delivered {
+        color: #ffc107; /* желтый */
+        font-weight: 600;
+    }
+    .status-not_delivered {
+        color: #dc3545; /* красный */
+        font-weight: 600;
+    }
+
+    /* Сообщения */
+    .messages {
+        margin-bottom: 1rem;
+    }
+
+    .alert {
+        padding: 0.75rem 1.25rem;
+        border-radius: 4px;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 0.8rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="orders-container">
+    <h1><i class="fas fa-shopping-cart"></i> Заказы</h1>
 
     {% if orders %}
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead style="background: linear-gradient(135deg, #1e90ff, #0047ab); color: white;">
+    <div class="table-responsive">
+        <table class="orders-table">
+            <thead>
                 <tr>
-                    <th style="padding: 1rem; text-align: left;">Номер заказа</th>
-                    <th style="padding: 1rem; text-align: left;">Клиент</th>
-                    <th style="padding: 1rem; text-align: left;">Статус</th>
-                    <th style="padding: 1rem; text-align: left;">Дата</th>
+                    <th>Номер заказа</th>
+                    <th>Отправитель</th>
+                    <th>Услуга</th>
+                    <th>Адрес отправки</th>
+                    <th>Адрес получателя</th>
+                    <th>Стоимость</th>
+                    <th>Статус</th>
+                    <th>Дата создания</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in orders %}
-                <tr style="border-bottom: 1px solid #e0e0e0;">
-                    <td style="padding: 0.75rem;">{{ order.id }}</td>
-                    <td style="padding: 0.75rem;">{{ order.customer_name }}</td>
-                    <td style="padding: 0.75rem;">{{ order.status }}</td>
-                    <td style="padding: 0.75rem;">{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>
+                        {% if order.sender %}
+                            {{ order.sender.name }}
+                        {% else %}
+                            Неизвестный
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if order.service %}
+                            {{ order.service.name }}
+                        {% else %}
+                            Без услуги
+                        {% endif %}
+                    </td>
+                    <td>{{ order.sender_address }}</td>
+                    <td>{{ order.recipient_address }}</td>
+                    <td>{{ order.cost|default:"Не указана" }} руб.</td>
+                    <td class="status-{{ order.status }}">
+                        {% if order.get_status_display %}
+                            {{ order.get_status_display }}
+                        {% else %}
+                            Неизвестен
+                        {% endif %}
+                    </td>
+                    <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
     {% else %}
-        <p style="text-align: center; color: #555;">Заказов пока нет.</p>
+    <div class="alert alert-info" style="text-align: center;">
+        <i class="fas fa-info-circle"></i> Заказов пока нет.
+    </div>
     {% endif %}
 </div>
 {% endblock %}

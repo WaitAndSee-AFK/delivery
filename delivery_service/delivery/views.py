@@ -15,11 +15,14 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 def staff_or_superuser_check(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
+from .models import Order
+
 @login_required
 @user_passes_test(staff_or_superuser_check)
 def orders(request):
-    orders = []
+    orders = Order.objects.select_related('sender', 'service').all().order_by('-created_at')
     return render(request, 'delivery/orders.html', {'orders': orders})
+
 
 
 class PriceListView(ListView):
@@ -120,4 +123,5 @@ def register(request):
 
 @login_required
 def profile(request):
-    return render(request, 'profile.html', {'user': request.user})
+    orders = Order.objects.filter(sender=request.user).order_by('-created_at')
+    return render(request, 'delivery/profile.html', {'orders': orders})
