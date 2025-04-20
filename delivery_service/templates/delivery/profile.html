@@ -4,71 +4,188 @@
 
 {% block content %}
 <style>
-    .profile-container {
-        max-width: 600px;
-        margin: 2rem auto;
-        background: #f9f9f9;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: #333;
-        position: relative;
-        text-align: center; /* Выравниваем элементы по центру */
+        line-height: 1.6;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
     }
-    h1 {
+
+    /* Центрированный заголовок с иконкой */
+    .profile-header {
+        max-width: 1200px;
+        margin: 2rem auto 1rem;
+        padding: 0 1rem;
+        text-align: center;
         color: #1e90ff;
-        margin-bottom: 1.5rem;
         font-weight: 600;
+        font-size: 2.2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .profile-header i {
+        font-size: 2.4rem;
+    }
+
+    /* Основной контейнер профиля */
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto 2rem;
+        padding: 0 1rem;
+        background: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-family: inherit;
+        color: #333;
         text-align: center;
     }
-    .order-info {
-        background: #fff;
-        padding: 1rem;
-        border-radius: 6px;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-        text-align: left; /* Возвращаем выравнивание текста влево для информации о заказе */
+
+    /* Таблица заказов */
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 0 0;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+        text-align: left;
+        table-layout: fixed;
     }
-    .order-info p {
-        margin: 0.3rem 0;
-    }
-    .edit-profile-btn {
-        display: inline-block; /* Делаем кнопку строчно-блочным элементом */
-        background: #1e90ff;
+
+    .orders-table thead {
+        background: linear-gradient(135deg, #1e90ff, #0047ab);
         color: white;
-        padding: 0.6rem 1.2rem;
-        border-radius: 4px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для кнопки */
     }
-    .edit-profile-btn:hover {
-        background: #0047ab;
-        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); /* Усиливаем тень при наведении */
+
+    .orders-table th, .orders-table td {
+        padding: 1rem;
+        font-size: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        vertical-align: middle;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+
+    .orders-table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .orders-table tbody tr:hover {
+        background-color: #f0f7ff;
+        transition: background-color 0.3s ease;
+    }
+
+    .order-description {
+        max-width: 250px;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .profile-header {
+            font-size: 1.8rem;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 0.8rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-container {
+            padding: 1rem;
+        }
+
+        .orders-table, .orders-table thead, .orders-table tbody, .orders-table th, .orders-table td, .orders-table tr {
+            display: block;
+        }
+
+        .orders-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        .orders-table tr {
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .orders-table td {
+            border: none;
+            position: relative;
+            padding-left: 50%;
+            text-align: right;
+        }
+
+        .orders-table td::before {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            font-weight: 600;
+            text-align: left;
+            color: #1e90ff;
+        }
+
+        .orders-table td:nth-of-type(1)::before { content: "Номер заказа"; }
+        .orders-table td:nth-of-type(2)::before { content: "Услуга"; }
+        .orders-table td:nth-of-type(3)::before { content: "Статус"; }
+        .orders-table td:nth-of-type(4)::before { content: "Стоимость"; }
+        .orders-table td:nth-of-type(5)::before { content: "Адрес отправки"; }
+        .orders-table td:nth-of-type(6)::before { content: "Адрес получателя"; }
+        .orders-table td:nth-of-type(7)::before { content: "Описание"; }
+        .orders-table td:nth-of-type(8)::before { content: "Дата создания"; }
     }
 </style>
 
+<div class="profile-header">
+    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+    <span>Ваши заказы</span>
+</div>
+
 <div class="profile-container">
-    <h1>Ваш профиль</h1>
-
     {% if orders %}
-        <div class="order-info">
-            <h2>Ваш последний заказ</h2>
-            {% with order=orders.0 %}
-                <p><strong>Номер заказа:</strong> {{ order.id }}</p>
-                <p><strong>Услуга:</strong> {{ order.service.name|default:"Не указана" }}</p>
-                <p><strong>Статус:</strong> {{ order.get_status_display }}</p>
-                <p><strong>Стоимость:</strong> {{ order.cost|default:"Не указана" }} руб.</p>
-                <p><strong>Адрес отправки:</strong> {{ order.sender_address|default:"Не указан" }}</p>
-                <p><strong>Адрес получателя:</strong> {{ order.recipient_address|default:"Не указан" }}</p>
-                <p><strong>Описание заказа:</strong> {{ order.order_description|default:"Нет описания" }}</p>
-                <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-            {% endwith %}
-        </div>
+        <table class="orders-table" aria-label="Таблица заказов пользователя">
+            <thead>
+                <tr>
+                    <th>Номер заказа</th>
+                    <th>Услуга</th>
+                    <th>Статус</th>
+                    <th>Стоимость</th>
+                    <th>Адрес отправки</th>
+                    <th>Адрес получателя</th>
+                    <th>Описание</th>
+                    <th>Дата создания</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.service.name|default:"Не указана" }}</td>
+                    <td>{{ order.get_status_display }}</td>
+                    <td>{{ order.cost|default:"Не указана" }} руб.</td>
+                    <td>{{ order.sender_address|default:"Не указан" }}</td>
+                    <td>{{ order.recipient_address|default:"Не указан" }}</td>
+                    <td class="order-description">{{ order.order_description|default:"Нет описания" }}</td>
+                    <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>У вас пока нет заказов.</p>
     {% endif %}
-
-    <a href="#" class="edit-profile-btn">Редактировать профиль</a>
 </div>
 {% endblock %}
