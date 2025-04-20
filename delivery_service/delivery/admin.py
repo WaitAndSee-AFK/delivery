@@ -20,10 +20,11 @@ class PriceAdmin(admin.ModelAdmin):
     list_editable = ('price_value',)
     readonly_fields = ('created_at',)
 
+
 @admin.register(PriceList)
 class PriceListAdmin(admin.ModelAdmin):
     list_display = ('number', 'created_at', 'valid_until', 'is_active')
-    readonly_fields = ('created_at',)  # Запрещаем редактирование даты создания
+    readonly_fields = ('created_at',)
     fieldsets = (
         (None, {
             'fields': ('number', 'is_active')
@@ -34,39 +35,45 @@ class PriceListAdmin(admin.ModelAdmin):
         }),
     )
 
-# Регистрация модели Service с другим именем класса
+
 @admin.register(Service)
-class ServiceModelAdmin(admin.ModelAdmin):  # Изменили имя класса
+class ServiceModelAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'price')
     search_fields = ('name', 'description')
     list_editable = ('price',)
 
-# Регистрация модели Role
+
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
 
-# Кастомная конфигурация для модели пользователя
+
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
-    list_display = ('phone', 'name', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active')
+
+    list_display = ('phone', 'name', 'role', 'is_ready', 'is_staff')  # Добавлено is_ready
+    list_filter = ('role', 'is_ready', 'is_staff', 'is_superuser', 'is_active')  # Добавлен фильтр по is_ready
+
     fieldsets = (
         (None, {'fields': ('phone', 'password')}),
-        ('Personal info', {'fields': ('name', 'email')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Персональная информация', {'fields': ('name', 'email', 'role', 'is_ready')}),  # Добавлено is_ready
+        ('Права доступа', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Важные даты', {'fields': ('last_login', 'date_joined')}),
     )
+
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('phone', 'name', 'password1', 'password2'),
+            'fields': ('phone', 'name', 'role', 'password1', 'password2', 'is_ready'),  # Добавлено is_ready
         }),
     )
-    search_fields = ('phone', 'name')
+
+    search_fields = ('phone', 'name', 'role__name')
     ordering = ('phone',)
+    filter_horizontal = ('groups', 'user_permissions',)
+
 
 admin.site.register(CustomUser, CustomUserAdmin)
