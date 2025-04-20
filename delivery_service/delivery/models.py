@@ -181,6 +181,15 @@ class CustomUserManager(BaseUserManager):
     def create_user(self, phone, name, password=None, **extra_fields):
         if not phone:
             raise ValueError(_('The Phone must be set'))
+
+        # Если роль не передана явно, пытаемся установить роль с id=1
+        if 'role' not in extra_fields:
+            try:
+                extra_fields['role'] = Role.objects.get(id=1)
+            except Role.DoesNotExist:
+                # Если роль с id=1 не найдена, оставляем null (по умолчанию)
+                pass
+
         user = self.model(phone=phone, name=name, **extra_fields)
         user.set_password(password)
         user.save()
@@ -190,6 +199,14 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+
+        # Для суперпользователя также пытаемся установить роль с id=1
+        if 'role' not in extra_fields:
+            try:
+                extra_fields['role'] = Role.objects.get(id=1)
+            except Role.DoesNotExist:
+                pass
+
         return self.create_user(phone, name, password, **extra_fields)
 
 
@@ -197,6 +214,18 @@ class CustomUser(AbstractUser):
     username = None  # Удаляем поле username
     phone = models.CharField(_('Phone'), max_length=20, unique=True)
     name = models.CharField(_('Name'), max_length=100)
+
+    is_ready = models.BooleanField(default=False, verbose_name="Готов к доставке")
+
+    role = models.ForeignKey(
+        Role,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,  # Явно указываем, что по умолчанию null
+        verbose_name="Роль",
+        related_name='users'
+    )
 
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = ['name']  # Обязательные поля при createsuperuser

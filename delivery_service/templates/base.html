@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Служба доставки{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -86,6 +86,43 @@
             color: #ffd700;
             transform: translateY(-2px);
         }
+        .status-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+        .status-btn.ready {
+            background-color: #28a745;
+        }
+        .status-btn.not-ready {
+            background-color: #dc3545;
+        }
+        .status-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .status-spinner {
+            display: none;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status-btn.loading .status-spinner {
+            display: inline-block;
+        }
+        .status-btn.loading .status-text {
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -97,19 +134,50 @@
                         <i class="fas fa-truck-fast"></i>
                         <span>ДоставкаЭкспресс</span>
                     </a>
+
+                    <!-- Base links for everyone -->
                     <a href="{% url 'home' %}"><i class="fas fa-home"></i> Главная</a>
-                    <a href="{% url 'delivery:services' %}"><i class="fas fa-box-open"></i> Услуги</a>
-                    <a href="{% url 'prices:prices' %}"><i class="fas fa-tag"></i> Цены</a>
+
+                    {% if not user.is_authenticated or user.role.id == 1 or user.is_superuser or user.is_staff %}
+                        <!-- For unauthorized users, clients, admins, and staff -->
+                        <a href="{% url 'delivery:services' %}"><i class="fas fa-box-open"></i> Услуги</a>
+                        <a href="{% url 'prices:prices' %}"><i class="fas fa-tag"></i> Цены</a>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        <!-- Additional links depending on the role -->
+                        {% if user.role.id == 2 %}
+                            <!-- For couriers and staff -->
+                            <a href="{% url 'courier_deliveries' %}"><i class="fas fa-truck"></i> Мои доставки</a>
+                        {% endif %}
+
+                        {% if user.role.id == 3 %}
+                            <!-- For administrators -->
+                            <a href="{% url 'admin_couriers' %}"><i class="fas fa-users"></i> Курьеры</a>
+                        {% endif %}
+                    {% endif %}
                 </div>
 
                 <div class="right-nav">
                     {% if user.is_authenticated %}
                         <span class="user-greeting">Привет, {{ user.name }}!</span>
+
+                        {% if user.role.id == 2 %}
+                            <!-- Кнопка статуса для курьеров -->
+                            <button id="status-btn" class="status-btn {% if user.is_ready %}ready{% else %}not-ready{% endif %}"
+                                    type="button">
+                                <i class="fas fa-power-off"></i>
+                                <i class="fas fa-spinner status-spinner"></i>
+                                <span class="status-text">{% if user.is_ready %}Готов{% else %}Не готов{% endif %}</span>
+                            </button>
+                        {% endif %}
+
                         {% if user.is_superuser or user.is_staff %}
                             <a href="{% url 'orders' %}"><i class="fas fa-shopping-cart"></i> Заказы</a>
-                        {% else %}
+                        {% elif user.role.id == 1 %}
                             <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Профиль</a>
                         {% endif %}
+
                         <form class="logoutButton" id="logout-form" method="post" action="/logout/">
                             {% csrf_token %}
                             <button type="submit">
@@ -117,8 +185,8 @@
                             </button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Вход</a>
-                        <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i></a>
+                        <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                        <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Регистрация</a>
                     {% endif %}
                 </div>
             </nav>
@@ -128,5 +196,55 @@
     <main class="container">
         {% block content %}{% endblock %}
     </main>
+
+    {% if user.is_authenticated and user.role.id == 2 %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('status-btn');
+            if (!btn) return;
+
+            btn.addEventListener('click', function() {
+                btn.disabled = true;
+                btn.classList.add('loading');
+
+                const currentStatus = btn.classList.contains('ready');
+                const newStatus = !currentStatus;
+
+                fetch("{% url 'courier_toggle_status' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ is_ready: newStatus })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка сети');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        btn.classList.toggle('ready', newStatus);
+                        btn.classList.toggle('not-ready', !newStatus);
+                        btn.querySelector('.status-text').textContent = newStatus ? 'Готов' : 'Не готов';
+
+                        alert('Статус успешно изменен');
+                    } else {
+                        throw new Error(data.error || 'Не удалось изменить статус');
+                    }
+                })
+                .catch(error => {
+                    alert('Ошибка: ' + error.message);
+                    btn.classList.toggle('ready', currentStatus);
+                    btn.classList.toggle('not-ready', !currentStatus);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                });
+            });
+        });
+    </script>
+    {% endif %}
 </body>
 </html>
