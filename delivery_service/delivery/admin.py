@@ -6,10 +6,42 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'sender', 'service', 'cost', 'status', 'created_at')
-    list_filter = ('status', 'created_at', 'service')
-    search_fields = ('sender__name', 'service__name', 'sender_address', 'recipient_address', 'order_description')
+    list_display = ('id', 'sender', 'courier', 'service', 'cost', 'status', 'created_at')  # Добавили courier
+    list_filter = ('status', 'created_at', 'service', 'courier')  # Добавили courier в фильтры
+    search_fields = (
+        'sender__name',
+        'courier__name',  # Добавили поиск по имени курьера
+        'service__name',
+        'sender_address',
+        'recipient_address',
+        'order_description',
+        'comment',  # Добавили поиск по комментарию
+        'claim'     # Добавили поиск по претензии
+    )
     readonly_fields = ('created_at',)
+
+    # Для удобства можно добавить поля в форму редактирования
+    fieldsets = (
+        (None, {
+            'fields': (
+                'sender',
+                'courier',
+                'service',
+                'sender_address',
+                'recipient_address',
+                'order_description',
+                'cost',
+                'status',
+                'comment',
+                'claim',
+            )
+        }),
+        ('Дополнительно', {
+            'fields': ('created_at',),
+            'classes': ('collapse',),
+        }),
+    )
+
 
 
 @admin.register(Price)

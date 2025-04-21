@@ -17,9 +17,97 @@ from .models import CustomUser, Role
 from .models import Order
 from .forms import CourierForm, CourierCreationForm
 from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+from django.views.generic import CreateView, UpdateView
+from django.urls import reverse_lazy
+from .models import Order
+from .forms import OrderForm, AssignCourierForm
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
+from .forms import CustomUserCreationForm, OrderForm
+from django.shortcuts import render, redirect
+from .forms import UserAndOrderForm
 
 
 # Create your views here.
+
+from django.shortcuts import render, redirect
+from .forms import UserAndOrderForm
+from .models import CustomUser, Service, Order
+from django.contrib.auth.hashers import make_password
+
+def create_user_and_order(request):
+    if request.method == 'POST':
+        form = UserAndOrderForm(request.POST)
+        if form.is_valid():
+            # Создание пользователя
+            user = CustomUser.objects.create(
+                name=form.cleaned_data['name'],
+                phone=form.cleaned_data['phone'],
+                password=make_password(form.cleaned_data['password1']),
+                role_id = 1 # Set default role id
+            )
+
+            # Создание заказа
+            order = Order.objects.create(
+                sender=user,  # Указываем созданного пользователя как отправителя
+                courier=form.cleaned_data['courier'],
+                service=form.cleaned_data['service'],
+                sender_address=form.cleaned_data['sender_address'],
+                recipient_address=form.cleaned_data['recipient_address'],
+                order_description=form.cleaned_data['order_description']
+            )
+
+            return redirect('orders')  # Замените 'success_url' на URL вашей страницы успеха
+    else:
+        form = UserAndOrderForm()
+
+    context = {
+        'form': form,
+        'user_form': UserAndOrderForm(prefix='user'),
+        'order_form': UserAndOrderForm(prefix='order'),
+        'couriers': CustomUser.objects.filter(role__id=2, is_ready=True),
+        'services': Service.objects.all(),
+    }
+    return render(request, 'delivery/create_user_and_order.html', context)
+
+
+class OrderCreateView(CreateView):
+    model = Order
+    form_class = OrderForm
+    template_name = 'delivery/order_form.html'  # Создайте этот шаблон
+    success_url = reverse_lazy('orders')  # URL списка заказов
+
+    def form_valid(self, form):
+        # Дополнительная логика при создании заказа
+        return super().form_valid(form)
+
+
+class OrderUpdateView(UpdateView):
+    model = Order
+    form_class = OrderForm
+    template_name = 'delivery/order_form.html'  # Создайте этот шаблон
+    success_url = reverse_lazy('orders')  # URL списка заказов
+
+
+class AssignCourierView(View):
+    template_name = 'delivery/assign_courier.html'  # Создайте этот шаблон
+
+    def get(self, request, pk):
+        order = get_object_or_404(Order, pk=pk)
+        form = AssignCourierForm(instance=order)
+        return render(request, self.template_name, {'form': form, 'order': order})
+
+    def post(self, request, pk):
+        order = get_object_or_404(Order, pk=pk)
+        form = AssignCourierForm(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            return redirect('orders')  # URL списка заказов
+        return render(request, self.template_name, {'form': form, 'order': order})
+
+
 def is_admin(user):
     return user.is_staff or user.is_superuser
 
@@ -34,7 +122,6 @@ def courier_create(request):
         form = CourierCreationForm(request.POST)
         if form.is_valid():
             courier = form.save()
-            messages.success(request, f'Курьер {courier.name} успешно добавлен')
             return redirect('admin_couriers')
     else:
         form = CourierCreationForm()
@@ -48,7 +135,6 @@ def courier_edit(request, pk):
         form = CourierForm(request.POST, instance=courier)
         if form.is_valid():
             courier = form.save()
-            messages.success(request, f'Данные курьера {courier.name} обновлены')
             return redirect('admin_couriers')
     else:
         form = CourierForm(instance=courier)
@@ -59,7 +145,6 @@ def courier_delete(request, pk):
     courier = get_object_or_404(CustomUser, pk=pk)
     if request.method == 'POST':
         courier.delete()
-        messages.success(request, 'Курьер успешно удален')
         return redirect('admin_couriers')
     return render(request, 'delivery/courier_confirm_delete.html', {'courier': courier})
 

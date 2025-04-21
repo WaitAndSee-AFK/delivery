@@ -12,7 +12,11 @@ from delivery.views import (
     courier_create,  # Добавлен импорт
     courier_toggle_status,
     courier_edit,
-    courier_delete
+    courier_delete,
+    OrderCreateView,
+    OrderUpdateView,
+    AssignCourierView,
+create_user_and_order,
 )
 
 urlpatterns = [
@@ -35,4 +39,11 @@ urlpatterns = [
     # Подключение других URL-конфигураций
     path('services/', include('delivery.urls', namespace='delivery')),
     path('prices/', include('delivery.urls_price', namespace='prices')),
+
+    path('orders/create/', OrderCreateView.as_view(), name='order_create'),
+    path('orders/<int:pk>/edit/', OrderUpdateView.as_view(), name='order_edit'),
+    path('orders/<int:pk>/assign-courier/', AssignCourierView.as_view(), name='order_assign_courier'),
+
+    path('create-user-and-order/', create_user_and_order, name='create_user_and_order'),
+
 ]

@@ -7,11 +7,11 @@ from django.conf import settings
 
 class Order(models.Model):
     STATUS_CHOICES = [
+        ('create', 'Создан'),
         ('courier', 'Доставляет курьер'),
-        ('ready_for_pickup', 'Готов к выдаче'),
         ('delivered', 'Вручен'),
-        ('partially_delivered', 'Частично вручен'),
         ('not_delivered', 'Не вручен'),
+        ('cancelled', 'Отменен'),
     ]
 
     sender = models.ForeignKey(
@@ -21,6 +21,15 @@ class Order(models.Model):
         blank=True,
         verbose_name="Отправитель",
         related_name='orders_sent'
+    )
+    courier = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Курьер",
+        related_name='orders_courier',
+        limit_choices_to={'role__id': 2}  # Ограничение выбора пользователей с ролью id=2
     )
     service = models.ForeignKey(
         'Service',
@@ -62,6 +71,18 @@ class Order(models.Model):
         default='courier',
         verbose_name="Статус заказа"
     )
+    comment = models.TextField(
+        verbose_name="Комментарий",
+        null=True,
+        blank=True,
+        default=None
+    )
+    claim = models.TextField(
+        verbose_name="Претензия",
+        null=True,
+        blank=True,
+        default=None
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     class Meta:
@@ -82,7 +103,6 @@ class Order(models.Model):
             if service_price is not None and (self.cost is None or self.cost != service_price):
                 self.cost = service_price
         super().save(*args, **kwargs)
-
 
 class Service(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название услуги")

@@ -20,7 +20,7 @@
     }
 
     .orders-container {
-        max-width: 1400px; /* растянули ширину */
+        max-width: 100%; /* Растягиваем контейнер на всю ширину */
         margin: 2rem auto;
         padding: 0 1rem;
     }
@@ -100,6 +100,42 @@
         color: #0c5460;
     }
 
+    /* Кнопки */
+    .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+        background-color: #1e90ff;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem; /* Добавляем отступ снизу для кнопок */
+        width: auto; /* Чтобы кнопки занимали всю ширину */
+    }
+    .btn:hover {
+        background-color: #0047ab;
+    }
+    .btn-secondary {
+        background-color: #28a745;
+    }
+    .btn-secondary:hover {
+        background-color: #1e7e34;
+    }
+    .btn-container {
+        margin-bottom: 1.5rem;
+        text-align: right;
+    }
+    .action-buttons {
+        /* white-space: nowrap; */ /* Убираем перенос в одну строку */
+        display: flex;
+        flex-direction: column; /* Выстраиваем кнопки в столбец */
+    }
+
     /* Адаптивность */
     @media (max-width: 768px) {
         h1 {
@@ -117,6 +153,10 @@
 <div class="orders-container">
     <h1><i class="fas fa-shopping-cart"></i> Заказы</h1>
 
+    <div class="btn-container">
+        <a href="{% url 'order_create' %}" class="btn">Создать заказ</a>
+    </div>
+
     {% if orders %}
     <div class="table-responsive">
         <table class="orders-table">
@@ -124,12 +164,14 @@
                 <tr>
                     <th>Номер заказа</th>
                     <th>Отправитель</th>
+                    <th>Курьер</th>
                     <th>Услуга</th>
                     <th>Адрес отправки</th>
                     <th>Адрес получателя</th>
                     <th>Стоимость</th>
                     <th>Статус</th>
                     <th>Дата создания</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
             <tbody>
@@ -141,6 +183,13 @@
                             {{ order.sender.name }}
                         {% else %}
                             Неизвестный
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if order.courier %}
+                            {{ order.courier.name }}
+                        {% else %}
+                            Не назначен
                         {% endif %}
                     </td>
                     <td>
@@ -161,6 +210,10 @@
                         {% endif %}
                     </td>
                     <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                    <td class="action-buttons">
+                        <a href="{% url 'order_edit' order.id %}" class="btn btn-secondary" title="Редактировать заказ">Редактировать</a>
+                        <a href="{% url 'order_assign_courier' order.id %}" class="btn" title="Назначить курьера">Назначить курьера</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
