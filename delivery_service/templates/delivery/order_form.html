@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}{% if form.instance.pk %}Редактировать заказ{% else %}Создать заказ{% endif %} - Служба доставки{% endblock %}
+{% block title %}
+    {% if form.instance.pk %}Редактировать заказ{% else %}Создать заказ{% endif %} - Служба доставки
+{% endblock %}
 
 {% block content %}
 <div style="max-width: 500px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
@@ -12,18 +14,24 @@
         {% csrf_token %}
 
         {% for field in form %}
-            <div style="margin-bottom: 1.5rem; width: 100%;">
-                <label for="{{ field.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
-                    {{ field.label }}{% if field.field.required %}*{% endif %}
-                </label>
-                {{ field }}
-                {% if field.help_text %}
-                    <small style="color: #666;">{{ field.help_text }}</small>
+            {% if not user.is_staff and not user.is_superuser and field.name == 'sender' %}
+                <!-- Для обычных пользователей скрываем поле sender -->
+            {% else %}
+                {% if field.name != 'courier' and field.name != 'comment' and field.name != 'claim' %}
+                    <div style="margin-bottom: 1.5rem; width: 100%;">
+                        <label for="{{ field.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                            {{ field.label }}{% if field.field.required %}*{% endif %}
+                        </label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small style="color: #666;">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ error }}</div>
+                        {% endfor %}
+                    </div>
                 {% endif %}
-                {% for error in field.errors %}
-                    <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ error }}</div>
-                {% endfor %}
-            </div>
+            {% endif %}
         {% endfor %}
 
         <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem;">
@@ -31,15 +39,20 @@
                 {% if form.instance.pk %}Сохранить изменения{% else %}Создать заказ{% endif %}
             </button>
 
-            {% if not form.instance.pk %}
-            <a href="{% url 'create_user_and_order' %}" class="btn-secondary">
-                Создать пользователя и заказ
-            </a>
+            {% if not form.instance.pk and user.is_staff or not form.instance.pk and user.is_superuser %}
+                <a href="{% url 'create_user_and_order' %}" class="btn-secondary">
+                    Создать пользователя и заказ
+                </a>
+
+                <a href="{% url 'orders' %}" class="btn-outline">
+                    Вернуться к списку заказов
+                </a>
             {% endif %}
 
-            <a href="{% url 'orders' %}" class="btn-outline">
-                Вернуться к списку заказов
-            </a>
+            <!-- Кнопка Отменить видна всем -->
+            <button type="button" class="btn-outline" onclick="history.back();">
+                Отменить
+            </button>
         </div>
     </form>
 </div>
@@ -99,12 +112,13 @@
     .btn-outline {
         background: white;
         color: #1e90ff;
-        border: none; /* Убрали границу */
+        border: none;
     }
     .btn-outline:hover {
         background: #e6f0ff;
         color: #0047ab;
-        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(30, 144, 255, 0.2);
     }
 
     button:hover, a:hover {

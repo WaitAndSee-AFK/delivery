@@ -3,7 +3,7 @@
 {% block title %}Создание пользователя и заказа - Служба доставки{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+<div style="max-width: 1200px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
     <h1 style="color: #1e90ff; text-align: center; margin-bottom: 1.5rem;">
         Создание пользователя и заказа
     </h1>
@@ -11,50 +11,122 @@
     <form method="post" style="width: 100%;">
         {% csrf_token %}
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+            <!-- Левая колонка - данные пользователя -->
             <div>
                 <h2 style="color: #1e90ff; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">
                     Данные пользователя
                 </h2>
 
-                {% for field in user_form %}
-                    <div style="margin-bottom: 1.5rem;">
-                        <label for="{{ field.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
-                            {{ field.label }}{% if field.field.required %}*{% endif %}
-                        </label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small style="color: #666; display: block; margin-top: 0.5rem;">
-                                {{ field.help_text }}
-                            </small>
-                        {% for error in field.errors %}
-                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ error }}</div>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_name" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Имя*
+                    </label>
+                    <input type="text" name="name" id="id_name" required style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Введите имя">
+                    {% if form.name.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_phone" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Телефон*
+                    </label>
+                    <input type="text" name="phone" id="id_phone" required style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="+79991234567">
+                    {% if form.phone.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.phone.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_password1" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Пароль*
+                    </label>
+                    <input type="password" name="password1" id="id_password1" required style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Введите пароль">
+                    {% if form.password1.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.password1.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_password2" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Подтверждение пароля*
+                    </label>
+                    <input type="password" name="password2" id="id_password2" required style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Повторите пароль">
+                    <small style="color: #666; display: block; margin-top: 0.5rem;">
+                        Для подтверждения введите, пожалуйста, пароль ещё раз.
+                    </small>
+                    {% if form.password2.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.password2.errors }}</div>
+                    {% endif %}
+                </div>
             </div>
 
+            <!-- Правая колонка - данные заказа -->
             <div>
                 <h2 style="color: #1e90ff; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">
                     Данные заказа
                 </h2>
-                {% for field in order_form %}
-                    <div style="margin-bottom: 1.5rem;">
-                        <label for="{{ field.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
-                            {{ field.label }}{% if field.field.required %}*{% endif %}
-                        </label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small style="color: #666; display: block; margin-top: 0.5rem;">
-                                {{ field.help_text }}
-                            </small>
-                        {% for error in field.errors %}
-                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ error }}</div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_service" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Услуга
+                    </label>
+                    <select name="service" id="id_service" style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">--- Выберите услугу ---</option>
+                        {% for service in services %}
+                            <option value="{{ service.id }}">{{ service.name }} ({{ service.price }} руб.)</option>
                         {% endfor %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                    </select>
+                    {% if form.service.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.service.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_courier" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Курьер
+                    </label>
+                    <select name="courier" id="id_courier" style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">--- Выберите курьера ---</option>
+                        {% for courier in couriers %}
+                            <option value="{{ courier.id }}">{{ courier.name }} ({{ courier.phone }})</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.courier.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.courier.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_sender_address" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Адрес отправки
+                    </label>
+                    <input type="text" name="sender_address" id="id_sender_address" style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Введите адрес отправки">
+                    {% if form.sender_address.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.sender_address.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_recipient_address" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Адрес получателя
+                    </label>
+                    <input type="text" name="recipient_address" id="id_recipient_address" style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Введите адрес получателя">
+                    {% if form.recipient_address.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.recipient_address.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="id_order_description" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333;">
+                        Описание заказа
+                    </label>
+                    <textarea name="order_description" id="id_order_description" rows="3" style="width: calc(100% - 1.5rem); padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Опишите заказ"></textarea>
+                    {% if form.order_description.errors %}
+                        <div style="color: red; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.order_description.errors }}</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
@@ -71,24 +143,6 @@
 </div>
 
 <style>
-input, select, textarea {
-    width: calc(100% - 1.5rem);
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-    margin-bottom: 0.5rem;
-    box-sizing: border-box;
-}
-
-input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: #1e90ff;
-    box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.2);
-}
-
 .btn-primary, .btn-outline {
     width: 100%;
     padding: 0.75rem;
@@ -127,17 +181,10 @@ input:focus, select:focus, textarea:focus {
     text-decoration: none;
 }
 
-.errorlist {
-    color: red;
-    list-style: none;
-    padding-left: 0;
-    margin-top: 0.25rem;
-    font-size: 0.875rem;
-}
-
-input[type="checkbox"] {
-    width: auto;
-    margin-right: 0.5rem;
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #1e90ff;
+    box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.2);
 }
 
 input[type="password"] {

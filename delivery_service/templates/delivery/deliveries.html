@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Все стили остаются без изменений */
+    .deliveries-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h1 {
+        text-align: center;
+        color: #1e90ff;
+        margin-bottom: 2rem;
+        font-weight: 700;
+        font-size: 2.6rem;
+        user-select: none;
+    }
+
+    .order-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 1.8rem 2rem;
+        margin-bottom: 1.8rem;
+        transition: box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+    .order-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #0047ab;
+        user-select: none;
+    }
+
+    .order-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.8rem;
+        font-size: 1.05rem;
+        color: #444;
+    }
+
+    .order-info div {
+        min-width: 220px;
+        flex: 1 1 220px;
+    }
+
+    .status {
+        font-weight: 700;
+        padding: 0.3rem 0.7rem;
+        border-radius: 20px;
+        color: white;
+        display: inline-block;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        user-select: none;
+    }
+    .status-create { background-color: #6c757d; }
+    .status-courier { background-color: #007bff; }
+    .status-delivered { background-color: #28a745; }
+    .status-not_delivered { background-color: #dc3545; }
+    .status-cancelled { background-color: #6c757d; }
+
+    /* Кнопка */
+    .btn-secondary {
+        background-color: #28a745;
+        padding: 0.45rem 1.1rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        border-radius: 6px;
+        color: white;
+        text-align: center;
+        display: inline-block;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 1.4rem;
+        width: fit-content;
+        user-select: none;
+        text-decoration: none;
+    }
+    .btn-secondary:hover {
+        background-color: #1e7e34;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 720px) {
+        .order-info {
+            flex-direction: column;
+        }
+        .order-info div {
+            min-width: auto;
+            flex: none;
+        }
+        .btn-secondary {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="deliveries-container">
+    <h1>Заказы курьера</h1>
+    {% if orders %}
+        {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <div>Заказ №{{ order.id }}</div>
+                    <div class="status status-{{ order.status }}">{{ order.get_status_display }}</div>
+                </div>
+                <div class="order-info">
+                    <div><strong>Отправитель:</strong> {{ order.sender.name|default:"Неизвестный" }}</div>
+                    <div><strong>Услуга:</strong> {{ order.service.name|default:"Без услуги" }}</div>
+                    <div><strong>Адрес отправки:</strong> {{ order.sender_address|default:"Не указан" }}</div>
+                    <div><strong>Адрес получателя:</strong> {{ order.recipient_address|default:"Не указан" }}</div>
+                    <div><strong>Описание:</strong> {{ order.order_description|default:"Нет описания" }}</div>
+                    <div><strong>Стоимость:</strong> {{ order.cost|default:"Не указана" }} руб.</div>
+                    <div><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                <!-- Исправленная строка: изменено имя URL на order_work -->
+                <a href="{% url 'order_work' order.id %}" class="btn-secondary">Работа с заказом</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center; font-size: 1.3rem; color: #666;">У вас пока нет назначенных заказов.</p>
+    {% endif %}
+</div>
+{% endblock %}
