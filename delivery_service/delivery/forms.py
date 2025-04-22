@@ -1,16 +1,47 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
-from .models import CustomUser, Service, Price, Role, Order
 from django.utils.translation import gettext_lazy as _
 
-# forms.py
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser, Order
+from .models import CustomUser, Service, Price, Role, Order
 
 
-from django import forms
-from .models import Order, CustomUser, Service
+
+class OrderClaimCommentForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['comment', 'claim']
+        labels = {
+            'comment': _('Комментарий'),
+            'claim': _('Претензия'),
+        }
+        widgets = {
+            'comment': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': _('Добавьте комментарий к заказу...'),
+                'class': 'form-control',
+            }),
+            'claim': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': _('Добавьте претензию к заказу...'),
+                'class': 'form-control',
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)  # Если понадобится пользователь
+        super().__init__(*args, **kwargs)
+
+        # Если нужно, можно добавить логику по правам пользователя
+        # Например, запретить редактировать claim для обычных пользователей
+        if self.user and not (self.user.is_staff or self.user.is_superuser):
+            # Например, запретить редактировать claim
+            # self.fields['claim'].disabled = True
+            pass
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Дополнительная валидация, если нужна
+        return cleaned_data
 
 class UserAndOrderForm(forms.Form):
     # Поля пользователя
@@ -113,8 +144,6 @@ class UserAndOrderForm(forms.Form):
             except (ValueError, Service.DoesNotExist):
                 pass
 
-
-
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
@@ -139,6 +168,46 @@ class OrderForm(forms.ModelForm):
             'status': _('Текущий статус заказа'),
         }
 
+    def __init__(self, *args, **kwargs):
+        courier_queryset = kwargs.pop('courier_queryset', None)
+        user = kwargs.pop('user', None)
+
+        super().__init__(*args, **kwargs)
+
+        # Настраиваем queryset для курьеров
+        if courier_queryset is not None:
+            self.fields['courier'].queryset = courier_queryset
+        else:
+            self.fields['courier'].queryset = CustomUser.objects.filter(role__id=2, is_ready=True)
+
+        # Кастомные метки для выбора курьера и услуги
+        self.fields['courier'].label_from_instance = lambda obj: f"{obj.name} ({obj.phone})"
+        self.fields['service'].label_from_instance = lambda obj: f"{obj.name} ({obj.price} руб.)"
+
+        # Для обычных пользователей скрываем поле sender и статус, делаем sender неизменяемым
+        if user and not (user.is_staff or user.is_superuser):
+            # Ограничиваем sender только текущим пользователем
+            self.fields['sender'].queryset = CustomUser.objects.filter(id=user.id)
+            self.fields['sender'].initial = user
+            self.fields['sender'].disabled = True
+
+            # Скрываем поле status — удаляем из формы
+            if 'status' in self.fields:
+                self.fields.pop('status')
+
+            # Можно также скрыть поля comment и claim, если нужно
+            # self.fields.pop('comment', None)
+            # self.fields.pop('claim', None)
+
+        # Для персонала и суперпользователей оставляем все поля доступными
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Если пользователь не персонал, принудительно устанавливаем статус 'create'
+        user = getattr(self, 'user', None)
+        if user and not (user.is_staff or user.is_superuser):
+            cleaned_data['status'] = 'create'
+        return cleaned_data
 
 class AssignCourierForm(forms.ModelForm):
     class Meta:
@@ -147,7 +216,6 @@ class AssignCourierForm(forms.ModelForm):
         labels = {
             'courier': _('Выберите курьера'),
         }
-
 
 class CourierForm(forms.ModelForm):
     class Meta:
@@ -169,7 +237,6 @@ class CourierForm(forms.ModelForm):
             }),
             'is_ready': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
-
 
 class CourierCreationForm(UserCreationForm):
     password1 = forms.CharField(
@@ -218,7 +285,6 @@ class CourierCreationForm(UserCreationForm):
             user.save()
         return user
 
-
 class PriceForm(forms.ModelForm):
     class Meta:
         model = Price
@@ -242,7 +308,6 @@ class PriceForm(forms.ModelForm):
                 'placeholder': _('Выберите прайс-лист')
             }),
         }
-
 
 class ServiceForm(forms.ModelForm):
     class Meta:
@@ -272,7 +337,6 @@ class ServiceForm(forms.ModelForm):
             }),
         }
 
-
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
@@ -282,7 +346,6 @@ class CustomUserCreationForm(UserCreationForm):
             'name': _('Имя'),
         }
 
-
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = CustomUser
@@ -291,7 +354,6 @@ class CustomUserChangeForm(UserChangeForm):
             'phone': _('Телефон'),
             'name': _('Имя'),
         }
-
 
 class PhoneAuthenticationForm(AuthenticationForm):
     username = forms.CharField(

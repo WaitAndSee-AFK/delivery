@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .order-work-container {
+        max-width: 700px;
+        margin: 2rem auto;
+        padding: 1rem 2rem;
+        background: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h2 {
+        color: #1e90ff;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .order-details {
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+    .order-details strong {
+        color: #0047ab;
+    }
+
+    form textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 1rem;
+        resize: vertical;
+        margin-bottom: 1.5rem;
+    }
+
+    button {
+        background-color: #28a745;
+        color: white;
+        font-weight: 700;
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+    button:hover {
+        background-color: #1e7e34;
+    }
+</style>
+
+<div class="order-work-container">
+    <h2>Работа с заказом №{{ order.id }}</h2>
+
+    <div class="order-details">
+        <p><strong>Отправитель:</strong> {{ order.sender.name|default:"Неизвестный" }}</p>
+        <p><strong>Услуга:</strong> {{ order.service.name|default:"Без услуги" }}</p>
+        <p><strong>Адрес отправки:</strong> {{ order.sender_address|default:"Не указан" }}</p>
+        <p><strong>Адрес получателя:</strong> {{ order.recipient_address|default:"Не указан" }}</p>
+        <p><strong>Описание:</strong> {{ order.order_description|default:"Нет описания" }}</p>
+        <p><strong>Стоимость:</strong> {{ order.cost|default:"Не указана" }} руб.</p>
+        <p><strong>Статус:</strong> {{ order.get_status_display }}</p>
+        <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.comment.label_tag }}<br/>
+        {{ form.comment }}<br/>
+        {{ form.claim.label_tag }}<br/>
+        {{ form.claim }}<br/>
+        <button type="submit">Сохранить</button>
+    </form>
+</div>
+{% endblock %}

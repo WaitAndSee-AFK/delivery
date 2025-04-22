@@ -1,8 +1,49 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Role, CustomUser, Service, PriceList, Price, Order
+from .models import Role, CustomUser, Service, PriceList, Price, Order, CompletedOrder
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
+
+@admin.register(CompletedOrder)
+class CompletedOrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'sender', 'courier', 'service', 'cost', 'status', 'created_at')
+    list_filter = ('status', 'created_at', 'service', 'courier')
+    search_fields = (
+        'sender__name',
+        'courier__name',
+        'service__name',
+        'sender_address',
+        'recipient_address',
+        'order_description',
+        'comment',
+        'claim'
+    )
+    readonly_fields = ('created_at',)
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                'sender',
+                'courier',
+                'service',
+                'sender_address',
+                'recipient_address',
+                'order_description',
+                'cost',
+                'status',
+                'comment',
+                'claim',
+            )
+        }),
+        ('Дополнительно', {
+            'fields': ('created_at',),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def has_add_permission(self, request):
+        """Запрещаем создание выполненных заказов вручную"""
+        return False
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

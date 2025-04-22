@@ -5,6 +5,104 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 
+class CompletedOrder(models.Model):
+    STATUS_CHOICES = [
+        ('create', 'Создан'),
+        ('courier', 'Доставляет курьер'),
+        ('delivered', 'Вручен'),
+        ('not_delivered', 'Не вручен'),
+        ('cancelled', 'Отменен'),
+    ]
+
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Отправитель",
+        related_name='completed_orders_sent'
+    )
+    courier = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Курьер",
+        related_name='completed_orders_courier',
+        limit_choices_to={'role__id': 2}
+    )
+    service = models.ForeignKey(
+        'Service',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Услуга",
+        related_name='completed_orders'
+    )
+
+    sender_address = models.CharField(
+        max_length=255,
+        verbose_name="Адрес отправки",
+        blank=True,
+        default=''
+    )
+    order_description = models.TextField(
+        verbose_name="Описание заказа",
+        blank=True,
+        default=''
+    )
+    recipient_address = models.CharField(
+        max_length=255,
+        verbose_name="Адрес получателя",
+        blank=True,
+        default=''
+    )
+    cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Стоимость",
+        null=True,
+        blank=True,
+        help_text="Стоимость берется из услуги"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='courier',
+        verbose_name="Статус заказа"
+    )
+    comment = models.TextField(
+        verbose_name="Комментарий",
+        null=True,
+        blank=True,
+        default=None
+    )
+    claim = models.TextField(
+        verbose_name="Претензия",
+        null=True,
+        blank=True,
+        default=None
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
+    class Meta:
+        verbose_name = "Выполненный заказ"
+        verbose_name_plural = "Выполненные заказы"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        sender_name = self.sender.name if self.sender else "Неизвестный отправитель"
+        service_name = self.service.name if self.service else "Без услуги"
+        cost_display = f"{self.cost} руб." if self.cost is not None else "Цена не указана"
+        return f"Выполненный заказ от {sender_name} — {service_name} — {cost_display}"
+
+    def save(self, *args, **kwargs):
+        if self.service:
+            service_price = self.service.price
+            if service_price is not None and (self.cost is None or self.cost != service_price):
+                self.cost = service_price
+        super().save(*args, **kwargs)
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('create', 'Создан'),
