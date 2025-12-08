@@ -1,0 +1,44 @@
+[
+    {
+        "claim": "",
+        "comment": "",
+        "cost": 900,
+        "courier_id": 6,
+        "created_at": "2025-04-22 16:02:52.539888",
+        "id": 1,
+        "order_description": "Перевести аквариум",
+        "recipient_address": "г. Северодвинск, ул. Проспект Победы 5, кв. 5",
+        "sender_address": "о. Ягры, Ул. Бутомы 2, кв. 10",
+        "sender_id": 3,
+        "service_id": 3,
+        "status": "not_delivered"
+    },
+    {
+        "claim": "",
+        "comment": "",
+        "cost": 700,
+        "courier_id": 4,
+        "created_at": "2025-04-22 16:03:09.620997",
+        "id": 2,
+        "order_description": "Перевести мешок картошки",
+        "recipient_address": "г. Северодвинск, ул. Проспект Победы 5, кв. 5",
+        "sender_address": "о. Ягры, Ул. Бутомы 2, кв. 10",
+        "sender_id": 3,
+        "service_id": 4,
+        "status": "cancelled"
+    },
+    {
+        "claim": "",
+        "comment": "",
+        "cost": 900,
+        "courier_id": null,
+        "created_at": "2025-04-22 17:20:58.512354",
+        "id": 3,
+        "order_description": "Перевести корзину вещей",
+        "recipient_address": "г. Северодвинск, ул. Проспект Победы 5, кв. 5",
+        "sender_address": "о. Ягры, Ул. Бутомы 2, кв. 10",
+        "sender_id": 9,
+        "service_id": 3,
+        "status": "delivered"
+    }
+]
